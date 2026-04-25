@@ -27,7 +27,7 @@ HttpCheckResult HttpChecker::CheckOne(const TargetConfig& target, int timeout_ms
     URL_COMPONENTS parts{}; std::wstring host, path;
     if (!CrackUrl(target.url, parts, host, path)) { r.error_message = L"Invalid URL"; return r; }
     auto start = std::chrono::steady_clock::now();
-    HINTERNET session = WinHttpOpen(L"NetDoctor/0.1", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+    HINTERNET session = WinHttpOpen(L"NetDoctor/0.2", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
     if (!session) { r.error_message = L"WinHttpOpen failed"; return r; }
     WinHttpSetTimeouts(session, timeout_ms, timeout_ms, timeout_ms, timeout_ms);
     HINTERNET connect = WinHttpConnect(session, host.c_str(), parts.nPort, 0);

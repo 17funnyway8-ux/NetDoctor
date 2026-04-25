@@ -7,6 +7,11 @@
 
 CNetDoctorPlugin& CNetDoctorPlugin::Instance() { static CNetDoctorPlugin inst; return inst; }
 
+CNetDoctorPlugin::~CNetDoctorPlugin() {
+    m_shutdown = true;
+    if (m_worker_thread.joinable()) m_worker_thread.join();
+}
+
 CNetDoctorPlugin::CNetDoctorPlugin() {
     m_items.emplace_back(std::make_unique<CNetSummaryItem>(*this));
     m_items.emplace_back(std::make_unique<CDnsStatusItem>(*this));
@@ -29,7 +34,12 @@ const wchar_t* CNetDoctorPlugin::GetInfo(PluginInfoIndex index) {
     default: return L"";
     }
 }
-const wchar_t* CNetDoctorPlugin::GetTooltipInfo() { std::lock_guard<std::mutex> lock(m_state_mutex); return m_tooltip.c_str(); }
+const wchar_t* CNetDoctorPlugin::GetTooltipInfo() {
+    thread_local std::wstring tooltip_snapshot;
+    std::lock_guard<std::mutex> lock(m_state_mutex);
+    tooltip_snapshot = m_tooltip;
+    return tooltip_snapshot.c_str();
+}
 NetDoctorState CNetDoctorPlugin::GetStateSnapshot() const { std::lock_guard<std::mutex> lock(m_state_mutex); return m_state; }
 void CNetDoctorPlugin::OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data) {
     if (index == EI_CONFIG_DIR && data && *data) { m_config_dir = data; LoadConfig(); }
@@ -52,8 +62,9 @@ void CNetDoctorPlugin::UpdateDataIfNeeded(bool force) {
 void CNetDoctorPlugin::StartWorkerCheck() {
     bool expected = false;
     if (!m_checking.compare_exchange_strong(expected, true)) return;
+    if (m_worker_thread.joinable()) m_worker_thread.join();
     ConfigManager config = m_config;
-    std::thread([this, config]() mutable {
+    m_worker_thread = std::thread([this, config]() mutable {
         try {
             NetworkChecker checker;
             DiagnosisEngine diagnosis;
@@ -66,9 +77,9 @@ void CNetDoctorPlugin::StartWorkerCheck() {
             state.diagnosis.summary_text = L"CHECK ERR";
             ApplyWorkerResult(std::move(state));
         }
-        m_has_checked = true;
+        if (!m_shutdown.load()) m_has_checked = true;
         m_checking = false;
-    }).detach();
+    });
 }
 
 void CNetDoctorPlugin::ApplyWorkerResult(NetDoctorState&& state) {

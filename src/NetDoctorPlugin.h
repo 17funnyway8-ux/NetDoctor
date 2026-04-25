@@ -13,6 +13,7 @@
 class CNetDoctorPlugin : public ITMPlugin {
 public:
     static CNetDoctorPlugin& Instance();
+    ~CNetDoctorPlugin();
     IPluginItem* GetItem(int index) override;
     void DataRequired() override;
     const wchar_t* GetInfo(PluginInfoIndex index) override;
@@ -39,4 +40,6 @@ private:
     std::chrono::steady_clock::time_point m_last_check{};
     std::atomic_bool m_checking{false};
     std::atomic_bool m_has_checked{false};
+    std::atomic_bool m_shutdown{false};
+    std::thread m_worker_thread;
 };
