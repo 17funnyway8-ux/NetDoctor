@@ -40,7 +40,7 @@ PublicIpInfo PublicIpChecker::Check(const std::vector<std::wstring>& providers, 
 bool PublicIpChecker::FetchText(const std::wstring& url, int timeout_ms, std::wstring& body, std::wstring& error_message) {
     URL_COMPONENTS parts{}; std::wstring host, path;
     if (!CrackUrl(url, parts, host, path)) { error_message = L"Invalid URL"; return false; }
-    HINTERNET session = WinHttpOpen(L"NetDoctor/0.6", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+    HINTERNET session = WinHttpOpen(L"NetDoctor/1.0", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
     if (!session) { error_message = L"WinHttpOpen failed"; return false; }
     WinHttpSetTimeouts(session, timeout_ms, timeout_ms, timeout_ms, timeout_ms);
     HINTERNET connect = WinHttpConnect(session, host.c_str(), parts.nPort, 0);

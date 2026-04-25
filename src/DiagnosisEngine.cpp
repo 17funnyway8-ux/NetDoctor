@@ -1,4 +1,5 @@
 #include "DiagnosisEngine.h"
+#include <algorithm>
 
 AreaStatus DiagnosisEngine::AnalyzeHttp(const std::vector<HttpCheckResult>& results, int good_ms, int slow_ms) {
     AreaStatus s; s.total_count = (int)results.size(); int total_ms = 0;
@@ -46,6 +47,8 @@ void DiagnosisEngine::Analyze(NetDoctorState& state, const ConfigManager& config
     state.dev_status = AnalyzeHttp(state.dev_results, th.latency_good_ms, th.latency_slow_ms);
     state.custom_status = AnalyzeHttp(state.custom_results, th.latency_good_ms, th.latency_slow_ms);
     state.ping_status = AnalyzePing(state.ping_results, th.latency_good_ms, th.latency_slow_ms);
+    state.ai_status = AnalyzeHttp(state.ai_results, th.latency_good_ms, th.latency_slow_ms);
+    state.home_status = AnalyzeHttp(state.home_results, th.latency_good_ms, th.latency_slow_ms);
     auto& d = state.diagnosis;
     d.overall_status = CheckStatus::Ok; d.summary_text = L"NET OK";
     if (state.dns_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Bad; d.summary_text = L"DNS BAD"; }
@@ -60,4 +63,8 @@ void DiagnosisEngine::Analyze(NetDoctorState& state, const ConfigManager& config
     else if (state.custom_status.status == CheckStatus::Warning) { d.overall_status = CheckStatus::Warning; d.summary_text = L"SITE WARN"; }
     else if (state.ping_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Warning; d.summary_text = L"PING BAD"; }
     else if (state.ping_status.status == CheckStatus::Slow) { d.overall_status = CheckStatus::Slow; d.summary_text = L"PING SLOW"; }
+    else if (state.ai_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Warning; d.summary_text = L"AI BAD"; }
+    else if (state.ai_status.status == CheckStatus::Warning) { d.overall_status = CheckStatus::Warning; d.summary_text = L"AI WARN"; }
+    else if (state.home_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Warning; d.summary_text = L"LAN BAD"; }
+    else if (state.home_status.status == CheckStatus::Warning) { d.overall_status = CheckStatus::Warning; d.summary_text = L"LAN WARN"; }
 }

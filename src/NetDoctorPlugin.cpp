@@ -1,6 +1,7 @@
 #include "NetDoctorPlugin.h"
 #include "NetDoctorItems.h"
 #include "Utils.h"
+#include "OptionsDialog.h"
 #include <windows.h>
 #include <sstream>
 #include <utility>
@@ -22,18 +23,25 @@ CNetDoctorPlugin::CNetDoctorPlugin() {
     m_items.emplace_back(std::make_unique<CDeveloperSitesItem>(*this));
     m_items.emplace_back(std::make_unique<CCustomSitesItem>(*this));
     m_items.emplace_back(std::make_unique<CPingStatusItem>(*this));
+    m_items.emplace_back(std::make_unique<CAiStatusItem>(*this));
+    m_items.emplace_back(std::make_unique<CHomeStatusItem>(*this));
     LoadConfig();
 }
 IPluginItem* CNetDoctorPlugin::GetItem(int index) { return (index >= 0 && index < (int)m_items.size()) ? m_items[index].get() : nullptr; }
 void CNetDoctorPlugin::DataRequired() { UpdateDataIfNeeded(false); }
-ITMPlugin::OptionReturn CNetDoctorPlugin::ShowOptionsDialog(void*) { return OR_OPTION_NOT_PROVIDED; }
+ITMPlugin::OptionReturn CNetDoctorPlugin::ShowOptionsDialog(void* hParent) {
+    if (m_checking.load() && m_worker_thread.joinable()) m_worker_thread.join();
+    LoadConfig();
+    OptionsDialog::OpenConfigFile(hParent, m_config.Path());
+    return OR_OPTION_UNCHANGED;
+}
 const wchar_t* CNetDoctorPlugin::GetInfo(PluginInfoIndex index) {
     switch (index) {
     case TMI_NAME: return L"NetDoctor";
     case TMI_DESCRIPTION: return L"网络质量诊断插件：DNS、国内/国际连通性、代理状态。";
     case TMI_AUTHOR: return L"clawclawclaw";
     case TMI_COPYRIGHT: return L"MIT";
-    case TMI_VERSION: return L"0.6.0";
+    case TMI_VERSION: return L"1.0.0";
     case TMI_URL: return L"";
     default: return L"";
     }
@@ -46,7 +54,11 @@ const wchar_t* CNetDoctorPlugin::GetTooltipInfo() {
 }
 NetDoctorState CNetDoctorPlugin::GetStateSnapshot() const { std::lock_guard<std::mutex> lock(m_state_mutex); return m_state; }
 void CNetDoctorPlugin::OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data) {
-    if (index == EI_CONFIG_DIR && data && *data) { m_config_dir = data; LoadConfig(); }
+    if (index == EI_CONFIG_DIR && data && *data) {
+        if (m_checking.load() && m_worker_thread.joinable()) m_worker_thread.join();
+        m_config_dir = data;
+        LoadConfig();
+    }
 }
 void CNetDoctorPlugin::LoadConfig() {
     std::wstring base = m_config_dir.empty() ? Utils::GetModuleDirectory() : m_config_dir;
@@ -103,6 +115,8 @@ void CNetDoctorPlugin::BuildTooltip() {
     ss << L"\n"; AppendHttp(ss, L"CN", m_state.cn_results); ss << L"\n"; AppendHttp(ss, L"International", m_state.intl_results);
     if (!m_state.dev_results.empty()) { ss << L"\n"; AppendHttp(ss, L"Developer", m_state.dev_results); }
     if (!m_state.custom_results.empty()) { ss << L"\n"; AppendHttp(ss, L"Custom Sites", m_state.custom_results); }
+    if (!m_state.ai_results.empty()) { ss << L"\n"; AppendHttp(ss, L"AI", m_state.ai_results); }
+    if (!m_state.home_results.empty()) { ss << L"\n"; AppendHttp(ss, L"Home/LAN", m_state.home_results); }
     if (!m_state.ping_results.empty()) {
         ss << L"\nPing:\n";
         for (auto& r : m_state.ping_results) {

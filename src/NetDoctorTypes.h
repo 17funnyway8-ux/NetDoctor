@@ -84,12 +84,16 @@ struct NetDoctorState {
     AreaStatus dev_status;
     AreaStatus custom_status;
     AreaStatus ping_status;
+    AreaStatus ai_status;
+    AreaStatus home_status;
     std::vector<DnsCheckResult> dns_results;
     std::vector<HttpCheckResult> cn_results;
     std::vector<HttpCheckResult> intl_results;
     std::vector<HttpCheckResult> dev_results;
     std::vector<HttpCheckResult> custom_results;
     std::vector<PingResult> ping_results;
+    std::vector<HttpCheckResult> ai_results;
+    std::vector<HttpCheckResult> home_results;
     ProxyStatus proxy_status;
     PublicIpInfo public_ip;
     std::wstring last_error;

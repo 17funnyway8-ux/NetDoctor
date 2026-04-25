@@ -17,11 +17,15 @@ public:
     const std::vector<TargetConfig>& DeveloperTargets() const { return m_dev_targets; }
     const std::vector<TargetConfig>& CustomTargets() const { return m_custom_targets; }
     const std::vector<std::wstring>& PingHosts() const { return m_ping_hosts; }
+    const std::vector<TargetConfig>& AiTargets() const { return m_ai_targets; }
+    const std::vector<TargetConfig>& HomeTargets() const { return m_home_targets; }
     const std::vector<EndpointConfig>& ProxyPorts() const { return m_proxy_ports; }
     const std::vector<std::wstring>& PublicIpProviders() const { return m_public_ip_providers; }
     bool DeveloperEnabled() const { return m_dev_enabled; }
     bool CustomSitesEnabled() const { return m_custom_enabled; }
     bool PingEnabled() const { return m_ping_enabled; }
+    bool AiEnabled() const { return m_ai_enabled; }
+    bool HomeEnabled() const { return m_home_enabled; }
     int PingCount() const { return m_ping_count; }
     bool PublicIpEnabled() const { return m_public_ip_enabled; }
     int PublicIpCheckIntervalSeconds() const { return m_public_ip_check_interval_seconds; }
@@ -43,11 +47,15 @@ private:
     std::vector<TargetConfig> m_dev_targets;
     std::vector<TargetConfig> m_custom_targets;
     std::vector<std::wstring> m_ping_hosts;
+    std::vector<TargetConfig> m_ai_targets;
+    std::vector<TargetConfig> m_home_targets;
     std::vector<EndpointConfig> m_proxy_ports;
     std::vector<std::wstring> m_public_ip_providers;
     bool m_dev_enabled{false};
     bool m_custom_enabled{false};
     bool m_ping_enabled{false};
+    bool m_ai_enabled{false};
+    bool m_home_enabled{false};
     int m_ping_count{4};
     bool m_public_ip_enabled{false};
     int m_public_ip_check_interval_seconds{600};

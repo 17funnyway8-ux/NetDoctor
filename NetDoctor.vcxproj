@@ -32,6 +32,7 @@
     <ClInclude Include="src\NetDoctorTypes.h" />
     <ClInclude Include="src\NetworkChecker.h" />
     <ClInclude Include="src\PingChecker.h" />
+    <ClInclude Include="src\OptionsDialog.h" />
     <ClInclude Include="src\ProxyChecker.h" />
     <ClInclude Include="src\PublicIpChecker.h" />
     <ClInclude Include="src\Utils.h" />
@@ -46,6 +47,7 @@
     <ClCompile Include="src\NetDoctorPlugin.cpp" />
     <ClCompile Include="src\NetworkChecker.cpp" />
     <ClCompile Include="src\PingChecker.cpp" />
+    <ClCompile Include="src\OptionsDialog.cpp" />
     <ClCompile Include="src\ProxyChecker.cpp" />
     <ClCompile Include="src\PublicIpChecker.cpp" />
     <ClCompile Include="src\Utils.cpp" />

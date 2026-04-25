@@ -41,6 +41,14 @@ Enabled=1
 DetectSystemProxy=1
 Ports=127.0.0.1:7890,127.0.0.1:7897,127.0.0.1:1080,127.0.0.1:20171
 
+[AI]
+Enabled=0
+Targets=OpenAI|https://api.openai.com,Anthropic|https://api.anthropic.com,Gemini|https://generativelanguage.googleapis.com,HuggingFace|https://huggingface.co,Ollama|http://127.0.0.1:11434,LMStudio|http://127.0.0.1:1234
+
+[Home]
+Enabled=0
+Targets=Router|http://192.168.1.1,NAS|http://192.168.1.10:5000,HomeAssistant|http://homeassistant.local:8123,Jellyfin|http://127.0.0.1:8096
+
 [Ping]
 Enabled=0
 Hosts=223.5.5.5,1.1.1.1,github.com
@@ -71,6 +79,10 @@ bool ConfigManager::Load(const std::wstring& path) {
     m_intl_targets = ParseTargets(ReadString(L"International", L"Targets", L"GitHub|https://github.com,Cloudflare|https://www.cloudflare.com"));
     m_dev_enabled = ReadInt(L"Developer", L"Enabled", 0) != 0;
     m_dev_targets = ParseTargets(ReadString(L"Developer", L"Targets", L"GitHub|https://github.com,GitHubRaw|https://raw.githubusercontent.com,npm|https://registry.npmjs.org,PyPI|https://pypi.org,Docker|https://hub.docker.com"));
+    m_ai_enabled = ReadInt(L"AI", L"Enabled", 0) != 0;
+    m_ai_targets = ParseTargets(ReadString(L"AI", L"Targets", L"OpenAI|https://api.openai.com,Anthropic|https://api.anthropic.com,Gemini|https://generativelanguage.googleapis.com,HuggingFace|https://huggingface.co,Ollama|http://127.0.0.1:11434,LMStudio|http://127.0.0.1:1234"));
+    m_home_enabled = ReadInt(L"Home", L"Enabled", 0) != 0;
+    m_home_targets = ParseTargets(ReadString(L"Home", L"Targets", L"Router|http://192.168.1.1,NAS|http://192.168.1.10:5000,HomeAssistant|http://homeassistant.local:8123,Jellyfin|http://127.0.0.1:8096"));
     m_ping_enabled = ReadInt(L"Ping", L"Enabled", 0) != 0;
     m_ping_hosts = Utils::Split(ReadString(L"Ping", L"Hosts", L"223.5.5.5,1.1.1.1,github.com"), L',');
     m_ping_count = ReadInt(L"Ping", L"Count", 4);

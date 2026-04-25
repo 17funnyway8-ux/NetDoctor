@@ -12,6 +12,8 @@ NetDoctorState NetworkChecker::CheckAll(const ConfigManager& config) {
     if (config.DeveloperEnabled()) s.dev_results = m_http.Check(config.DeveloperTargets(), config.TimeoutMilliseconds());
     if (config.CustomSitesEnabled()) s.custom_results = m_http.Check(config.CustomTargets(), config.TimeoutMilliseconds());
     if (config.PingEnabled()) s.ping_results = m_ping.Check(config.PingHosts(), config.PingCount(), config.TimeoutMilliseconds());
+    if (config.AiEnabled()) s.ai_results = m_http.Check(config.AiTargets(), config.TimeoutMilliseconds());
+    if (config.HomeEnabled()) s.home_results = m_http.Check(config.HomeTargets(), config.TimeoutMilliseconds());
     if (config.ProxyEnabled()) s.proxy_status = m_proxy.Check(config.ProxyPorts(), config.DetectSystemProxy(), config.TimeoutMilliseconds());
     if (config.PublicIpEnabled()) s.public_ip = m_public_ip.Check(config.PublicIpProviders(), config.TimeoutMilliseconds());
     s.last_update = std::chrono::system_clock::now();

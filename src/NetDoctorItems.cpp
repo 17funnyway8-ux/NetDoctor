@@ -15,6 +15,8 @@ CPublicIpItem::CPublicIpItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"公�
 CDeveloperSitesItem::CDeveloperSitesItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"开发者站点", L"NetDoctorDevSites", L"DEV", L"DEV 4/5") {}
 CCustomSitesItem::CCustomSitesItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"自定义站点", L"NetDoctorCustomSites", L"SITE", L"SITE 3/4") {}
 CPingStatusItem::CPingStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"Ping 状态", L"NetDoctorPing", L"PING", L"PING 32ms") {}
+CAiStatusItem::CAiStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"AI 服务", L"NetDoctorAI", L"AI", L"AI 4/6") {}
+CHomeStatusItem::CHomeStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"家庭网络", L"NetDoctorHome", L"LAN", L"LAN 3/4") {}
 std::wstring CNetSummaryItem::BuildValue() const { return m_plugin.GetStateSnapshot().diagnosis.summary_text; }
 static std::wstring AreaText(const wchar_t* prefix, const AreaStatus& a) {
     if (a.status == CheckStatus::Bad) return std::wstring(prefix) + L" BAD";
@@ -76,3 +78,13 @@ std::wstring CPingStatusItem::BuildValue() const {
     if (a.avg_latency_ms >= 0) { std::wstringstream ss; ss << L"PING " << a.avg_latency_ms << L"ms"; return ss.str(); }
     return L"PING ...";
 }
+
+static std::wstring GroupText(const wchar_t* prefix, const AreaStatus& a) {
+    if (a.total_count == 0) return std::wstring(prefix) + L" OFF";
+    if (a.status == CheckStatus::Bad) return std::wstring(prefix) + L" BAD";
+    if (a.status == CheckStatus::Slow) return std::wstring(prefix) + L" SLOW";
+    if (a.success_count < a.total_count) { std::wstringstream ss; ss << prefix << L" " << a.success_count << L"/" << a.total_count; return ss.str(); }
+    return std::wstring(prefix) + L" OK";
+}
+std::wstring CAiStatusItem::BuildValue() const { return GroupText(L"AI", m_plugin.GetStateSnapshot().ai_status); }
+std::wstring CHomeStatusItem::BuildValue() const { return GroupText(L"LAN", m_plugin.GetStateSnapshot().home_status); }
