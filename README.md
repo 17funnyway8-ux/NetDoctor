@@ -1,0 +1,77 @@
+# NetDoctor
+
+NetDoctor 是一个 TrafficMonitor 网络质量诊断插件 MVP。它不重复显示网速，而是补充诊断：DNS、国内/国际连通性、代理状态，并在 Tooltip 里展示详细检查结果。
+
+## MVP 显示项
+
+- 网络诊断：`NET OK` / `DNS BAD` / `INTL BAD` / `INTL SLOW`
+- DNS 状态：`DNS 23ms` / `DNS SLOW` / `DNS BAD`
+- 国内网络：`CN 32ms` / `CN BAD`
+- 国际网络：`INTL 220ms` / `INTL BAD`
+- 代理状态：`Proxy ON` / `Proxy OFF`
+
+## 构建
+
+使用 Visual Studio 2022 打开 `NetDoctor.sln`，选择 `Release|x64` 或 `Release|Win32` 构建。
+
+依赖均为 Windows SDK / 系统库：
+
+- WinHTTP：HTTP HEAD 探测
+- Ws2_32：DNS、TCP 端口探测
+
+## 安装
+
+将生成的 `NetDoctor.dll` 放入：
+
+```text
+TrafficMonitor.exe 所在目录/plugins/
+```
+
+重启 TrafficMonitor 后，在“插件管理”和“显示设置”中启用相关显示项。
+
+## 配置
+
+插件会自动创建：
+
+```text
+plugins/NetDoctor/NetDoctor.ini
+```
+
+默认配置：
+
+```ini
+[General]
+CheckIntervalSeconds=30
+TimeoutMilliseconds=3000
+
+[Threshold]
+LatencyGoodMs=100
+LatencySlowMs=300
+DnsGoodMs=80
+DnsSlowMs=200
+
+[DNS]
+Domains=www.baidu.com,github.com,cloudflare.com
+
+[CN]
+Targets=Baidu|https://www.baidu.com,QQ|https://www.qq.com
+
+[International]
+Targets=GitHub|https://github.com,Cloudflare|https://www.cloudflare.com
+
+[Proxy]
+Enabled=1
+DetectSystemProxy=1
+Ports=127.0.0.1:7890,127.0.0.1:7897,127.0.0.1:1080,127.0.0.1:20171
+```
+
+## 当前限制
+
+- MVP 使用同步检测，目标数量不宜过多。
+- 暂无图形化设置界面。
+- 暂未实现公网 IP、Ping 丢包、开发者 Profile、AI Profile、历史统计。
+- HTTP 目前使用 HEAD 请求；部分网站不支持 HEAD 时可能显示异常，后续可 fallback 到 GET。
+
+## 设计文档
+
+详见：`NetDoctor_产品设计与技术方案.md`

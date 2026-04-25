@@ -1,0 +1,29 @@
+#include "NetDoctorItems.h"
+#include "NetDoctorPlugin.h"
+#include <sstream>
+#include <utility>
+
+CNetDoctorItemBase::CNetDoctorItemBase(CNetDoctorPlugin& plugin, std::wstring name, std::wstring id, std::wstring label, std::wstring sample)
+    : m_plugin(plugin), m_name(std::move(name)), m_id(std::move(id)), m_label(std::move(label)), m_sample(std::move(sample)) {}
+const wchar_t* CNetDoctorItemBase::GetItemValueText() const { m_value = BuildValue(); return m_value.c_str(); }
+CNetSummaryItem::CNetSummaryItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"网络诊断", L"NetDoctorSummary", L"NET", L"INTL SLOW") {}
+CDnsStatusItem::CDnsStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"DNS 状态", L"NetDoctorDNS", L"DNS", L"DNS 88ms") {}
+CCnStatusItem::CCnStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"国内网络", L"NetDoctorCN", L"CN", L"CN 88ms") {}
+CIntlStatusItem::CIntlStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"国际网络", L"NetDoctorIntl", L"INTL", L"INTL 288ms") {}
+CProxyStatusItem::CProxyStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"代理状态", L"NetDoctorProxy", L"Proxy", L"Proxy ON") {}
+std::wstring CNetSummaryItem::BuildValue() const { return m_plugin.GetState().diagnosis.summary_text; }
+static std::wstring AreaText(const wchar_t* prefix, const AreaStatus& a) {
+    if (a.status == CheckStatus::Bad) return std::wstring(prefix) + L" BAD";
+    if (a.status == CheckStatus::Slow) return std::wstring(prefix) + L" SLOW";
+    if (a.status == CheckStatus::Warning) return std::wstring(prefix) + L" WARN";
+    if (a.avg_latency_ms >= 0) { std::wstringstream ss; ss << prefix << L" " << a.avg_latency_ms << L"ms"; return ss.str(); }
+    return std::wstring(prefix) + L" ...";
+}
+std::wstring CDnsStatusItem::BuildValue() const { return AreaText(L"DNS", m_plugin.GetState().dns_status); }
+std::wstring CCnStatusItem::BuildValue() const { return AreaText(L"CN", m_plugin.GetState().cn_status); }
+std::wstring CIntlStatusItem::BuildValue() const { return AreaText(L"INTL", m_plugin.GetState().intl_status); }
+std::wstring CProxyStatusItem::BuildValue() const {
+    const auto& p = m_plugin.GetState().proxy_status;
+    if (p.system_proxy_enabled || p.local_proxy_detected) return L"Proxy ON";
+    return L"Proxy OFF";
+}

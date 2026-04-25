@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32"><Configuration>Debug</Configuration><Platform>Win32</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32"><Configuration>Release</Configuration><Platform>Win32</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{9C8B0D1E-52B5-45BB-9E55-5F4D2C893001}</ProjectGuid>
+    <RootNamespace>NetDoctor</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration"><ConfigurationType>DynamicLibrary</ConfigurationType><UseDebugLibraries>true</UseDebugLibraries><PlatformToolset>v143</PlatformToolset><CharacterSet>Unicode</CharacterSet><LanguageStandard>stdcpp17</LanguageStandard></PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration"><ConfigurationType>DynamicLibrary</ConfigurationType><UseDebugLibraries>false</UseDebugLibraries><PlatformToolset>v143</PlatformToolset><WholeProgramOptimization>true</WholeProgramOptimization><CharacterSet>Unicode</CharacterSet><LanguageStandard>stdcpp17</LanguageStandard></PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ItemDefinitionGroup>
+    <ClCompile><WarningLevel>Level3</WarningLevel><SDLCheck>true</SDLCheck><ConformanceMode>true</ConformanceMode><LanguageStandard>stdcpp17</LanguageStandard><AdditionalIncludeDirectories>include;src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories></ClCompile>
+    <Link><SubSystem>Windows</SubSystem><AdditionalDependencies>Winhttp.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies></Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\PluginInterface.h" />
+    <ClInclude Include="src\ConfigManager.h" />
+    <ClInclude Include="src\DiagnosisEngine.h" />
+    <ClInclude Include="src\DnsChecker.h" />
+    <ClInclude Include="src\HttpChecker.h" />
+    <ClInclude Include="src\NetDoctorItems.h" />
+    <ClInclude Include="src\NetDoctorPlugin.h" />
+    <ClInclude Include="src\NetDoctorTypes.h" />
+    <ClInclude Include="src\NetworkChecker.h" />
+    <ClInclude Include="src\ProxyChecker.h" />
+    <ClInclude Include="src\Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ConfigManager.cpp" />
+    <ClCompile Include="src\DiagnosisEngine.cpp" />
+    <ClCompile Include="src\DllMain.cpp" />
+    <ClCompile Include="src\DnsChecker.cpp" />
+    <ClCompile Include="src\HttpChecker.cpp" />
+    <ClCompile Include="src\NetDoctorItems.cpp" />
+    <ClCompile Include="src\NetDoctorPlugin.cpp" />
+    <ClCompile Include="src\NetworkChecker.cpp" />
+    <ClCompile Include="src\ProxyChecker.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
