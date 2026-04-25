@@ -14,8 +14,10 @@ public:
     const std::vector<std::wstring>& DnsDomains() const { return m_dns_domains; }
     const std::vector<TargetConfig>& CnTargets() const { return m_cn_targets; }
     const std::vector<TargetConfig>& IntlTargets() const { return m_intl_targets; }
+    const std::vector<TargetConfig>& DeveloperTargets() const { return m_dev_targets; }
     const std::vector<EndpointConfig>& ProxyPorts() const { return m_proxy_ports; }
     const std::vector<std::wstring>& PublicIpProviders() const { return m_public_ip_providers; }
+    bool DeveloperEnabled() const { return m_dev_enabled; }
     bool PublicIpEnabled() const { return m_public_ip_enabled; }
     int PublicIpCheckIntervalSeconds() const { return m_public_ip_check_interval_seconds; }
     bool ProxyEnabled() const { return m_proxy_enabled; }
@@ -33,8 +35,10 @@ private:
     std::vector<std::wstring> m_dns_domains;
     std::vector<TargetConfig> m_cn_targets;
     std::vector<TargetConfig> m_intl_targets;
+    std::vector<TargetConfig> m_dev_targets;
     std::vector<EndpointConfig> m_proxy_ports;
     std::vector<std::wstring> m_public_ip_providers;
+    bool m_dev_enabled{false};
     bool m_public_ip_enabled{false};
     int m_public_ip_check_interval_seconds{600};
     bool m_proxy_enabled{true};

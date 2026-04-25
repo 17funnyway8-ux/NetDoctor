@@ -9,6 +9,7 @@ NetDoctorState NetworkChecker::CheckAll(const ConfigManager& config) {
     s.dns_results = m_dns.Check(config.DnsDomains());
     s.cn_results = m_http.Check(config.CnTargets(), config.TimeoutMilliseconds());
     s.intl_results = m_http.Check(config.IntlTargets(), config.TimeoutMilliseconds());
+    if (config.DeveloperEnabled()) s.dev_results = m_http.Check(config.DeveloperTargets(), config.TimeoutMilliseconds());
     if (config.ProxyEnabled()) s.proxy_status = m_proxy.Check(config.ProxyPorts(), config.DetectSystemProxy(), config.TimeoutMilliseconds());
     if (config.PublicIpEnabled()) s.public_ip = m_public_ip.Check(config.PublicIpProviders(), config.TimeoutMilliseconds());
     s.last_update = std::chrono::system_clock::now();

@@ -32,6 +32,10 @@ Targets=Baidu|https://www.baidu.com,QQ|https://www.qq.com
 Enabled=1
 Targets=GitHub|https://github.com,Cloudflare|https://www.cloudflare.com
 
+[Developer]
+Enabled=0
+Targets=GitHub|https://github.com,GitHubRaw|https://raw.githubusercontent.com,npm|https://registry.npmjs.org,PyPI|https://pypi.org,Docker|https://hub.docker.com
+
 [Proxy]
 Enabled=1
 DetectSystemProxy=1
@@ -56,6 +60,8 @@ bool ConfigManager::Load(const std::wstring& path) {
     m_dns_domains = Utils::Split(ReadString(L"DNS", L"Domains", L"www.baidu.com,github.com,cloudflare.com"), L',');
     m_cn_targets = ParseTargets(ReadString(L"CN", L"Targets", L"Baidu|https://www.baidu.com,QQ|https://www.qq.com"));
     m_intl_targets = ParseTargets(ReadString(L"International", L"Targets", L"GitHub|https://github.com,Cloudflare|https://www.cloudflare.com"));
+    m_dev_enabled = ReadInt(L"Developer", L"Enabled", 0) != 0;
+    m_dev_targets = ParseTargets(ReadString(L"Developer", L"Targets", L"GitHub|https://github.com,GitHubRaw|https://raw.githubusercontent.com,npm|https://registry.npmjs.org,PyPI|https://pypi.org,Docker|https://hub.docker.com"));
     m_public_ip_enabled = ReadInt(L"PublicIP", L"Enabled", 0) != 0;
     m_public_ip_check_interval_seconds = ReadInt(L"PublicIP", L"CheckIntervalSeconds", 600);
     m_public_ip_providers = Utils::Split(ReadString(L"PublicIP", L"Providers", L"https://api.ipify.org,https://ifconfig.me/ip"), L',');

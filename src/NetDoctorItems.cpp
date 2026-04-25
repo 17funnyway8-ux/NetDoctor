@@ -12,6 +12,7 @@ CCnStatusItem::CCnStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"国�
 CIntlStatusItem::CIntlStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"国际网络", L"NetDoctorIntl", L"INTL", L"INTL 288ms") {}
 CProxyStatusItem::CProxyStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"代理状态", L"NetDoctorProxy", L"Proxy", L"Proxy ON") {}
 CPublicIpItem::CPublicIpItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"公网出口", L"NetDoctorPublicIP", L"IP", L"IP 1.2.3.4") {}
+CDeveloperSitesItem::CDeveloperSitesItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"开发者站点", L"NetDoctorDevSites", L"DEV", L"DEV 4/5") {}
 std::wstring CNetSummaryItem::BuildValue() const { return m_plugin.GetStateSnapshot().diagnosis.summary_text; }
 static std::wstring AreaText(const wchar_t* prefix, const AreaStatus& a) {
     if (a.status == CheckStatus::Bad) return std::wstring(prefix) + L" BAD";
@@ -37,4 +38,16 @@ std::wstring CPublicIpItem::BuildValue() const {
     if (!ip.success) return L"IP BAD";
     if (ip.ip.empty()) return L"IP ?";
     return L"IP " + ip.ip;
+}
+
+std::wstring CDeveloperSitesItem::BuildValue() const {
+    auto state = m_plugin.GetStateSnapshot();
+    const auto& a = state.dev_status;
+    if (a.total_count == 0) return L"DEV OFF";
+    if (a.status == CheckStatus::Bad) return L"DEV BAD";
+    if (a.status == CheckStatus::Slow) return L"DEV SLOW";
+    if (a.success_count < a.total_count) {
+        std::wstringstream ss; ss << L"DEV " << a.success_count << L"/" << a.total_count; return ss.str();
+    }
+    return L"DEV OK";
 }
