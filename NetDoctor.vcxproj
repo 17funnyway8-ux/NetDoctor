@@ -19,7 +19,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup>
     <ClCompile><WarningLevel>Level3</WarningLevel><SDLCheck>true</SDLCheck><ConformanceMode>true</ConformanceMode><LanguageStandard>stdcpp17</LanguageStandard><AdditionalIncludeDirectories>include;src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories></ClCompile>
-    <Link><SubSystem>Windows</SubSystem><AdditionalDependencies>Winhttp.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies></Link>
+    <Link><SubSystem>Windows</SubSystem><AdditionalDependencies>Winhttp.lib;Ws2_32.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies></Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\PluginInterface.h" />
@@ -31,6 +31,7 @@
     <ClInclude Include="src\NetDoctorPlugin.h" />
     <ClInclude Include="src\NetDoctorTypes.h" />
     <ClInclude Include="src\NetworkChecker.h" />
+    <ClInclude Include="src\PingChecker.h" />
     <ClInclude Include="src\ProxyChecker.h" />
     <ClInclude Include="src\PublicIpChecker.h" />
     <ClInclude Include="src\Utils.h" />
@@ -44,6 +45,7 @@
     <ClCompile Include="src\NetDoctorItems.cpp" />
     <ClCompile Include="src\NetDoctorPlugin.cpp" />
     <ClCompile Include="src\NetworkChecker.cpp" />
+    <ClCompile Include="src\PingChecker.cpp" />
     <ClCompile Include="src\ProxyChecker.cpp" />
     <ClCompile Include="src\PublicIpChecker.cpp" />
     <ClCompile Include="src\Utils.cpp" />

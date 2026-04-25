@@ -8,4 +8,5 @@ public:
 private:
     AreaStatus AnalyzeHttp(const std::vector<HttpCheckResult>& results, int good_ms, int slow_ms);
     AreaStatus AnalyzeDns(const std::vector<DnsCheckResult>& results, int good_ms, int slow_ms);
+    AreaStatus AnalyzePing(const std::vector<PingResult>& results, int good_ms, int slow_ms);
 };

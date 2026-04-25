@@ -21,6 +21,23 @@ AreaStatus DiagnosisEngine::AnalyzeDns(const std::vector<DnsCheckResult>& result
     else s.status = CheckStatus::Ok;
     return s;
 }
+
+AreaStatus DiagnosisEngine::AnalyzePing(const std::vector<PingResult>& results, int good_ms, int slow_ms) {
+    AreaStatus s; s.total_count = (int)results.size(); int total_ms = 0; int success_hosts = 0;
+    int worst_loss = 0;
+    for (auto& r : results) {
+        if (r.success) { success_hosts++; total_ms += r.avg_latency_ms; worst_loss = std::max(worst_loss, r.loss_percent); }
+    }
+    s.success_count = success_hosts;
+    if (s.total_count == 0) { s.status = CheckStatus::Unknown; return s; }
+    if (success_hosts == 0) { s.status = CheckStatus::Bad; return s; }
+    s.avg_latency_ms = total_ms / success_hosts;
+    if (worst_loss >= 50 || success_hosts < s.total_count) s.status = CheckStatus::Warning;
+    else if (s.avg_latency_ms >= slow_ms || worst_loss >= 5) s.status = CheckStatus::Slow;
+    else s.status = CheckStatus::Ok;
+    return s;
+}
+
 void DiagnosisEngine::Analyze(NetDoctorState& state, const ConfigManager& config) {
     auto th = config.Thresholds();
     state.dns_status = AnalyzeDns(state.dns_results, th.dns_good_ms, th.dns_slow_ms);
@@ -28,6 +45,7 @@ void DiagnosisEngine::Analyze(NetDoctorState& state, const ConfigManager& config
     state.intl_status = AnalyzeHttp(state.intl_results, th.latency_good_ms, th.latency_slow_ms);
     state.dev_status = AnalyzeHttp(state.dev_results, th.latency_good_ms, th.latency_slow_ms);
     state.custom_status = AnalyzeHttp(state.custom_results, th.latency_good_ms, th.latency_slow_ms);
+    state.ping_status = AnalyzePing(state.ping_results, th.latency_good_ms, th.latency_slow_ms);
     auto& d = state.diagnosis;
     d.overall_status = CheckStatus::Ok; d.summary_text = L"NET OK";
     if (state.dns_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Bad; d.summary_text = L"DNS BAD"; }
@@ -40,4 +58,6 @@ void DiagnosisEngine::Analyze(NetDoctorState& state, const ConfigManager& config
     else if (state.dev_status.status == CheckStatus::Warning) { d.overall_status = CheckStatus::Warning; d.summary_text = L"DEV WARN"; }
     else if (state.custom_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Warning; d.summary_text = L"SITE BAD"; }
     else if (state.custom_status.status == CheckStatus::Warning) { d.overall_status = CheckStatus::Warning; d.summary_text = L"SITE WARN"; }
+    else if (state.ping_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Warning; d.summary_text = L"PING BAD"; }
+    else if (state.ping_status.status == CheckStatus::Slow) { d.overall_status = CheckStatus::Slow; d.summary_text = L"PING SLOW"; }
 }

@@ -4,6 +4,7 @@
 #include "HttpChecker.h"
 #include "ProxyChecker.h"
 #include "PublicIpChecker.h"
+#include "PingChecker.h"
 
 class NetworkChecker {
 public:
@@ -13,4 +14,5 @@ private:
     HttpChecker m_http;
     ProxyChecker m_proxy;
     PublicIpChecker m_public_ip;
+    PingChecker m_ping;
 };

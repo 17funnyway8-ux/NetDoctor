@@ -14,6 +14,7 @@ CProxyStatusItem::CProxyStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, 
 CPublicIpItem::CPublicIpItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"公网出口", L"NetDoctorPublicIP", L"IP", L"IP 1.2.3.4") {}
 CDeveloperSitesItem::CDeveloperSitesItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"开发者站点", L"NetDoctorDevSites", L"DEV", L"DEV 4/5") {}
 CCustomSitesItem::CCustomSitesItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"自定义站点", L"NetDoctorCustomSites", L"SITE", L"SITE 3/4") {}
+CPingStatusItem::CPingStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"Ping 状态", L"NetDoctorPing", L"PING", L"PING 32ms") {}
 std::wstring CNetSummaryItem::BuildValue() const { return m_plugin.GetStateSnapshot().diagnosis.summary_text; }
 static std::wstring AreaText(const wchar_t* prefix, const AreaStatus& a) {
     if (a.status == CheckStatus::Bad) return std::wstring(prefix) + L" BAD";
@@ -63,4 +64,15 @@ std::wstring CCustomSitesItem::BuildValue() const {
         std::wstringstream ss; ss << L"SITE " << a.success_count << L"/" << a.total_count; return ss.str();
     }
     return L"SITE OK";
+}
+
+std::wstring CPingStatusItem::BuildValue() const {
+    auto state = m_plugin.GetStateSnapshot();
+    const auto& a = state.ping_status;
+    if (a.total_count == 0) return L"PING OFF";
+    if (a.status == CheckStatus::Bad) return L"PING BAD";
+    if (a.status == CheckStatus::Warning) { std::wstringstream ss; ss << L"PING " << a.success_count << L"/" << a.total_count; return ss.str(); }
+    if (a.status == CheckStatus::Slow) return L"PING SLOW";
+    if (a.avg_latency_ms >= 0) { std::wstringstream ss; ss << L"PING " << a.avg_latency_ms << L"ms"; return ss.str(); }
+    return L"PING ...";
 }

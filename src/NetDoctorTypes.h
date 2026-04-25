@@ -32,6 +32,18 @@ struct DnsCheckResult {
     std::wstring error_message;
 };
 
+struct PingResult {
+    std::wstring host;
+    bool success{false};
+    int sent{0};
+    int received{0};
+    int loss_percent{100};
+    int avg_latency_ms{-1};
+    int min_latency_ms{-1};
+    int max_latency_ms{-1};
+    std::wstring error_message;
+};
+
 struct ProxyStatus {
     bool system_proxy_enabled{false};
     std::wstring proxy_server;
@@ -71,11 +83,13 @@ struct NetDoctorState {
     AreaStatus intl_status;
     AreaStatus dev_status;
     AreaStatus custom_status;
+    AreaStatus ping_status;
     std::vector<DnsCheckResult> dns_results;
     std::vector<HttpCheckResult> cn_results;
     std::vector<HttpCheckResult> intl_results;
     std::vector<HttpCheckResult> dev_results;
     std::vector<HttpCheckResult> custom_results;
+    std::vector<PingResult> ping_results;
     ProxyStatus proxy_status;
     PublicIpInfo public_ip;
     std::wstring last_error;

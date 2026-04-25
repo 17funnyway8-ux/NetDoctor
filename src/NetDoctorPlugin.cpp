@@ -21,6 +21,7 @@ CNetDoctorPlugin::CNetDoctorPlugin() {
     m_items.emplace_back(std::make_unique<CPublicIpItem>(*this));
     m_items.emplace_back(std::make_unique<CDeveloperSitesItem>(*this));
     m_items.emplace_back(std::make_unique<CCustomSitesItem>(*this));
+    m_items.emplace_back(std::make_unique<CPingStatusItem>(*this));
     LoadConfig();
 }
 IPluginItem* CNetDoctorPlugin::GetItem(int index) { return (index >= 0 && index < (int)m_items.size()) ? m_items[index].get() : nullptr; }
@@ -32,7 +33,7 @@ const wchar_t* CNetDoctorPlugin::GetInfo(PluginInfoIndex index) {
     case TMI_DESCRIPTION: return L"网络质量诊断插件：DNS、国内/国际连通性、代理状态。";
     case TMI_AUTHOR: return L"clawclawclaw";
     case TMI_COPYRIGHT: return L"MIT";
-    case TMI_VERSION: return L"0.5.0";
+    case TMI_VERSION: return L"0.6.0";
     case TMI_URL: return L"";
     default: return L"";
     }
@@ -102,6 +103,16 @@ void CNetDoctorPlugin::BuildTooltip() {
     ss << L"\n"; AppendHttp(ss, L"CN", m_state.cn_results); ss << L"\n"; AppendHttp(ss, L"International", m_state.intl_results);
     if (!m_state.dev_results.empty()) { ss << L"\n"; AppendHttp(ss, L"Developer", m_state.dev_results); }
     if (!m_state.custom_results.empty()) { ss << L"\n"; AppendHttp(ss, L"Custom Sites", m_state.custom_results); }
+    if (!m_state.ping_results.empty()) {
+        ss << L"\nPing:\n";
+        for (auto& r : m_state.ping_results) {
+            ss << L"  " << r.host << L": " << (r.success ? L"OK " : L"BAD ");
+            if (r.avg_latency_ms >= 0) ss << r.avg_latency_ms << L"ms ";
+            ss << L"loss " << r.loss_percent << L"%";
+            if (!r.error_message.empty()) ss << L" " << r.error_message;
+            ss << L"\n";
+        }
+    }
     ss << L"\nProxy:\n  System: " << (m_state.proxy_status.system_proxy_enabled ? L"ON " : L"OFF ") << m_state.proxy_status.proxy_server << L"\n";
     ss << L"  Local: " << (m_state.proxy_status.local_proxy_detected ? L"ON " : L"OFF ") << m_state.proxy_status.detected_proxy_address << L"\n";
     ss << L"\nPublic IP:\n  " << (m_state.public_ip.enabled ? (m_state.public_ip.success ? m_state.public_ip.ip : L"BAD") : L"Disabled") << L"\n";
