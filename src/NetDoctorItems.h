@@ -25,3 +25,4 @@ class CIntlStatusItem : public CNetDoctorItemBase { public: CIntlStatusItem(CNet
 class CProxyStatusItem : public CNetDoctorItemBase { public: CProxyStatusItem(CNetDoctorPlugin& p); private: std::wstring BuildValue() const override; };
 class CPublicIpItem : public CNetDoctorItemBase { public: CPublicIpItem(CNetDoctorPlugin& p); private: std::wstring BuildValue() const override; };
 class CDeveloperSitesItem : public CNetDoctorItemBase { public: CDeveloperSitesItem(CNetDoctorPlugin& p); private: std::wstring BuildValue() const override; };
+class CCustomSitesItem : public CNetDoctorItemBase { public: CCustomSitesItem(CNetDoctorPlugin& p); private: std::wstring BuildValue() const override; };

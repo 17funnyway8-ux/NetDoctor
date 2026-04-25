@@ -27,6 +27,7 @@ void DiagnosisEngine::Analyze(NetDoctorState& state, const ConfigManager& config
     state.cn_status = AnalyzeHttp(state.cn_results, th.latency_good_ms, th.latency_slow_ms);
     state.intl_status = AnalyzeHttp(state.intl_results, th.latency_good_ms, th.latency_slow_ms);
     state.dev_status = AnalyzeHttp(state.dev_results, th.latency_good_ms, th.latency_slow_ms);
+    state.custom_status = AnalyzeHttp(state.custom_results, th.latency_good_ms, th.latency_slow_ms);
     auto& d = state.diagnosis;
     d.overall_status = CheckStatus::Ok; d.summary_text = L"NET OK";
     if (state.dns_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Bad; d.summary_text = L"DNS BAD"; }
@@ -37,4 +38,6 @@ void DiagnosisEngine::Analyze(NetDoctorState& state, const ConfigManager& config
     else if (state.cn_status.status == CheckStatus::Slow) { d.overall_status = CheckStatus::Slow; d.summary_text = L"CN SLOW"; }
     else if (state.dev_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Warning; d.summary_text = L"DEV BAD"; }
     else if (state.dev_status.status == CheckStatus::Warning) { d.overall_status = CheckStatus::Warning; d.summary_text = L"DEV WARN"; }
+    else if (state.custom_status.status == CheckStatus::Bad) { d.overall_status = CheckStatus::Warning; d.summary_text = L"SITE BAD"; }
+    else if (state.custom_status.status == CheckStatus::Warning) { d.overall_status = CheckStatus::Warning; d.summary_text = L"SITE WARN"; }
 }

@@ -41,6 +41,10 @@ Enabled=1
 DetectSystemProxy=1
 Ports=127.0.0.1:7890,127.0.0.1:7897,127.0.0.1:1080,127.0.0.1:20171
 
+[CustomSites]
+Enabled=0
+Targets=NAS|http://192.168.1.10:5000,Router|http://192.168.1.1,Blog|https://example.com
+
 [PublicIP]
 Enabled=0
 CheckIntervalSeconds=600
@@ -62,6 +66,8 @@ bool ConfigManager::Load(const std::wstring& path) {
     m_intl_targets = ParseTargets(ReadString(L"International", L"Targets", L"GitHub|https://github.com,Cloudflare|https://www.cloudflare.com"));
     m_dev_enabled = ReadInt(L"Developer", L"Enabled", 0) != 0;
     m_dev_targets = ParseTargets(ReadString(L"Developer", L"Targets", L"GitHub|https://github.com,GitHubRaw|https://raw.githubusercontent.com,npm|https://registry.npmjs.org,PyPI|https://pypi.org,Docker|https://hub.docker.com"));
+    m_custom_enabled = ReadInt(L"CustomSites", L"Enabled", 0) != 0;
+    m_custom_targets = ParseTargets(ReadString(L"CustomSites", L"Targets", L"NAS|http://192.168.1.10:5000,Router|http://192.168.1.1,Blog|https://example.com"));
     m_public_ip_enabled = ReadInt(L"PublicIP", L"Enabled", 0) != 0;
     m_public_ip_check_interval_seconds = ReadInt(L"PublicIP", L"CheckIntervalSeconds", 600);
     m_public_ip_providers = Utils::Split(ReadString(L"PublicIP", L"Providers", L"https://api.ipify.org,https://ifconfig.me/ip"), L',');
