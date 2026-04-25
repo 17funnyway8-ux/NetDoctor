@@ -11,6 +11,7 @@ CDnsStatusItem::CDnsStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"DN
 CCnStatusItem::CCnStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"国内网络", L"NetDoctorCN", L"CN", L"CN 88ms") {}
 CIntlStatusItem::CIntlStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"国际网络", L"NetDoctorIntl", L"INTL", L"INTL 288ms") {}
 CProxyStatusItem::CProxyStatusItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"代理状态", L"NetDoctorProxy", L"Proxy", L"Proxy ON") {}
+CPublicIpItem::CPublicIpItem(CNetDoctorPlugin& p) : CNetDoctorItemBase(p, L"公网出口", L"NetDoctorPublicIP", L"IP", L"IP 1.2.3.4") {}
 std::wstring CNetSummaryItem::BuildValue() const { return m_plugin.GetStateSnapshot().diagnosis.summary_text; }
 static std::wstring AreaText(const wchar_t* prefix, const AreaStatus& a) {
     if (a.status == CheckStatus::Bad) return std::wstring(prefix) + L" BAD";
@@ -27,4 +28,13 @@ std::wstring CProxyStatusItem::BuildValue() const {
     const auto& p = state.proxy_status;
     if (p.system_proxy_enabled || p.local_proxy_detected) return L"Proxy ON";
     return L"Proxy OFF";
+}
+
+std::wstring CPublicIpItem::BuildValue() const {
+    auto state = m_plugin.GetStateSnapshot();
+    const auto& ip = state.public_ip;
+    if (!ip.enabled) return L"IP OFF";
+    if (!ip.success) return L"IP BAD";
+    if (ip.ip.empty()) return L"IP ?";
+    return L"IP " + ip.ip;
 }

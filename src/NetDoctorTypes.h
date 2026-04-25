@@ -42,6 +42,15 @@ struct ProxyStatus {
     bool proxy_usable{false};
 };
 
+struct PublicIpInfo {
+    bool enabled{false};
+    bool success{false};
+    std::wstring ip;
+    std::wstring provider;
+    std::wstring error_message;
+    std::chrono::system_clock::time_point last_update{};
+};
+
 struct AreaStatus {
     CheckStatus status{CheckStatus::Unknown};
     int avg_latency_ms{-1};
@@ -64,6 +73,7 @@ struct NetDoctorState {
     std::vector<HttpCheckResult> cn_results;
     std::vector<HttpCheckResult> intl_results;
     ProxyStatus proxy_status;
+    PublicIpInfo public_ip;
     std::wstring last_error;
     std::chrono::system_clock::time_point last_update{};
 };

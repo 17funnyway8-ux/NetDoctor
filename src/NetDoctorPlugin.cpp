@@ -18,6 +18,7 @@ CNetDoctorPlugin::CNetDoctorPlugin() {
     m_items.emplace_back(std::make_unique<CCnStatusItem>(*this));
     m_items.emplace_back(std::make_unique<CIntlStatusItem>(*this));
     m_items.emplace_back(std::make_unique<CProxyStatusItem>(*this));
+    m_items.emplace_back(std::make_unique<CPublicIpItem>(*this));
     LoadConfig();
 }
 IPluginItem* CNetDoctorPlugin::GetItem(int index) { return (index >= 0 && index < (int)m_items.size()) ? m_items[index].get() : nullptr; }
@@ -29,7 +30,7 @@ const wchar_t* CNetDoctorPlugin::GetInfo(PluginInfoIndex index) {
     case TMI_DESCRIPTION: return L"网络质量诊断插件：DNS、国内/国际连通性、代理状态。";
     case TMI_AUTHOR: return L"clawclawclaw";
     case TMI_COPYRIGHT: return L"MIT";
-    case TMI_VERSION: return L"0.2.0";
+    case TMI_VERSION: return L"0.3.0";
     case TMI_URL: return L"";
     default: return L"";
     }
@@ -99,6 +100,9 @@ void CNetDoctorPlugin::BuildTooltip() {
     ss << L"\n"; AppendHttp(ss, L"CN", m_state.cn_results); ss << L"\n"; AppendHttp(ss, L"International", m_state.intl_results);
     ss << L"\nProxy:\n  System: " << (m_state.proxy_status.system_proxy_enabled ? L"ON " : L"OFF ") << m_state.proxy_status.proxy_server << L"\n";
     ss << L"  Local: " << (m_state.proxy_status.local_proxy_detected ? L"ON " : L"OFF ") << m_state.proxy_status.detected_proxy_address << L"\n";
+    ss << L"\nPublic IP:\n  " << (m_state.public_ip.enabled ? (m_state.public_ip.success ? m_state.public_ip.ip : L"BAD") : L"Disabled") << L"\n";
+    if (!m_state.public_ip.provider.empty()) ss << L"  Provider: " << m_state.public_ip.provider << L"\n";
+    if (!m_state.public_ip.error_message.empty()) ss << L"  Error: " << m_state.public_ip.error_message << L"\n";
     ss << L"\nLast Check:\n  " << Utils::FormatTimeNow();
     m_tooltip = ss.str();
 }

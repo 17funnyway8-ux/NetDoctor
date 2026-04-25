@@ -36,6 +36,11 @@ Targets=GitHub|https://github.com,Cloudflare|https://www.cloudflare.com
 Enabled=1
 DetectSystemProxy=1
 Ports=127.0.0.1:7890,127.0.0.1:7897,127.0.0.1:1080,127.0.0.1:20171
+
+[PublicIP]
+Enabled=0
+CheckIntervalSeconds=600
+Providers=https://api.ipify.org,https://ifconfig.me/ip
 )ini";
     return true;
 }
@@ -51,6 +56,9 @@ bool ConfigManager::Load(const std::wstring& path) {
     m_dns_domains = Utils::Split(ReadString(L"DNS", L"Domains", L"www.baidu.com,github.com,cloudflare.com"), L',');
     m_cn_targets = ParseTargets(ReadString(L"CN", L"Targets", L"Baidu|https://www.baidu.com,QQ|https://www.qq.com"));
     m_intl_targets = ParseTargets(ReadString(L"International", L"Targets", L"GitHub|https://github.com,Cloudflare|https://www.cloudflare.com"));
+    m_public_ip_enabled = ReadInt(L"PublicIP", L"Enabled", 0) != 0;
+    m_public_ip_check_interval_seconds = ReadInt(L"PublicIP", L"CheckIntervalSeconds", 600);
+    m_public_ip_providers = Utils::Split(ReadString(L"PublicIP", L"Providers", L"https://api.ipify.org,https://ifconfig.me/ip"), L',');
     m_proxy_enabled = ReadInt(L"Proxy", L"Enabled", 1) != 0;
     m_detect_system_proxy = ReadInt(L"Proxy", L"DetectSystemProxy", 1) != 0;
     m_proxy_ports = ParseEndpoints(ReadString(L"Proxy", L"Ports", L"127.0.0.1:7890,127.0.0.1:7897,127.0.0.1:1080,127.0.0.1:20171"));

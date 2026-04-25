@@ -32,6 +32,7 @@
     <ClInclude Include="src\NetDoctorTypes.h" />
     <ClInclude Include="src\NetworkChecker.h" />
     <ClInclude Include="src\ProxyChecker.h" />
+    <ClInclude Include="src\PublicIpChecker.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +45,7 @@
     <ClCompile Include="src\NetDoctorPlugin.cpp" />
     <ClCompile Include="src\NetworkChecker.cpp" />
     <ClCompile Include="src\ProxyChecker.cpp" />
+    <ClCompile Include="src\PublicIpChecker.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
