@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include <windows.h>
 #include <sstream>
+#include <utility>
 
 CNetDoctorPlugin& CNetDoctorPlugin::Instance() { static CNetDoctorPlugin inst; return inst; }
 
@@ -23,12 +24,13 @@ const wchar_t* CNetDoctorPlugin::GetInfo(PluginInfoIndex index) {
     case TMI_DESCRIPTION: return L"网络质量诊断插件：DNS、国内/国际连通性、代理状态。";
     case TMI_AUTHOR: return L"clawclawclaw";
     case TMI_COPYRIGHT: return L"MIT";
-    case TMI_VERSION: return L"0.1.0";
+    case TMI_VERSION: return L"0.2.0";
     case TMI_URL: return L"";
     default: return L"";
     }
 }
-const wchar_t* CNetDoctorPlugin::GetTooltipInfo() { return m_tooltip.c_str(); }
+const wchar_t* CNetDoctorPlugin::GetTooltipInfo() { std::lock_guard<std::mutex> lock(m_state_mutex); return m_tooltip.c_str(); }
+NetDoctorState CNetDoctorPlugin::GetStateSnapshot() const { std::lock_guard<std::mutex> lock(m_state_mutex); return m_state; }
 void CNetDoctorPlugin::OnExtenedInfo(ExtendedInfoIndex index, const wchar_t* data) {
     if (index == EI_CONFIG_DIR && data && *data) { m_config_dir = data; LoadConfig(); }
 }
@@ -42,15 +44,37 @@ void CNetDoctorPlugin::UpdateDataIfNeeded(bool force) {
     auto now = std::chrono::steady_clock::now();
     if (!force && m_last_check.time_since_epoch().count() != 0 &&
         std::chrono::duration_cast<std::chrono::seconds>(now - m_last_check).count() < m_config.CheckIntervalSeconds()) return;
+    if (m_checking.load()) return;
     m_last_check = now;
-    try {
-        m_state = m_checker.CheckAll(m_config);
-        m_diagnosis.Analyze(m_state, m_config);
-        BuildTooltip();
-    } catch (...) {
-        m_state.last_error = L"Unknown exception during check";
-        m_state.diagnosis.summary_text = L"CHECK ERR";
-    }
+    StartWorkerCheck();
+}
+
+void CNetDoctorPlugin::StartWorkerCheck() {
+    bool expected = false;
+    if (!m_checking.compare_exchange_strong(expected, true)) return;
+    ConfigManager config = m_config;
+    std::thread([this, config]() mutable {
+        try {
+            NetworkChecker checker;
+            DiagnosisEngine diagnosis;
+            NetDoctorState state = checker.CheckAll(config);
+            diagnosis.Analyze(state, config);
+            ApplyWorkerResult(std::move(state));
+        } catch (...) {
+            NetDoctorState state;
+            state.last_error = L"Unknown exception during check";
+            state.diagnosis.summary_text = L"CHECK ERR";
+            ApplyWorkerResult(std::move(state));
+        }
+        m_has_checked = true;
+        m_checking = false;
+    }).detach();
+}
+
+void CNetDoctorPlugin::ApplyWorkerResult(NetDoctorState&& state) {
+    std::lock_guard<std::mutex> lock(m_state_mutex);
+    m_state = std::move(state);
+    BuildTooltip();
 }
 static void AppendHttp(std::wstringstream& ss, const wchar_t* title, const std::vector<HttpCheckResult>& rs) {
     ss << title << L":\n";

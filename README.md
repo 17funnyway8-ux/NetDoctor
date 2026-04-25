@@ -1,6 +1,6 @@
 # NetDoctor
 
-NetDoctor 是一个 TrafficMonitor 网络质量诊断插件 MVP。它不重复显示网速，而是补充诊断：DNS、国内/国际连通性、代理状态，并在 Tooltip 里展示详细检查结果。
+NetDoctor 是一个 TrafficMonitor 网络质量诊断插件 MVP。当前已加入后台线程异步检测，避免阻塞 TrafficMonitor UI。它不重复显示网速，而是补充诊断：DNS、国内/国际连通性、代理状态，并在 Tooltip 里展示详细检查结果。
 
 ## MVP 显示项
 
@@ -65,12 +65,17 @@ DetectSystemProxy=1
 Ports=127.0.0.1:7890,127.0.0.1:7897,127.0.0.1:1080,127.0.0.1:20171
 ```
 
+## 当前进展
+
+- V0.1：插件骨架、五个显示项、INI 配置、DNS/HTTP/代理检测、Tooltip。
+- V0.2：后台线程异步检测；HTTP HEAD 失败后自动 fallback 到 GET，减少误报。
+
 ## 当前限制
 
-- MVP 使用同步检测，目标数量不宜过多。
+- 虽然已异步检测，但目标数量仍不宜过多。
 - 暂无图形化设置界面。
 - 暂未实现公网 IP、Ping 丢包、开发者 Profile、AI Profile、历史统计。
-- HTTP 目前使用 HEAD 请求；部分网站不支持 HEAD 时可能显示异常，后续可 fallback 到 GET。
+- HTTP 优先使用 HEAD，请求失败或遇到 403/405 时 fallback 到 GET。
 
 ## 设计文档
 

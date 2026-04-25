@@ -33,20 +33,34 @@ HttpCheckResult HttpChecker::CheckOne(const TargetConfig& target, int timeout_ms
     HINTERNET connect = WinHttpConnect(session, host.c_str(), parts.nPort, 0);
     if (!connect) { r.error_message = L"WinHttpConnect failed"; WinHttpCloseHandle(session); return r; }
     DWORD flags = (parts.nScheme == INTERNET_SCHEME_HTTPS) ? WINHTTP_FLAG_SECURE : 0;
-    HINTERNET req = WinHttpOpenRequest(connect, L"HEAD", path.c_str(), nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, flags);
-    if (!req) { r.error_message = L"WinHttpOpenRequest failed"; WinHttpCloseHandle(connect); WinHttpCloseHandle(session); return r; }
-    BOOL ok = WinHttpSendRequest(req, WINHTTP_NO_ADDITIONAL_HEADERS, 0, WINHTTP_NO_REQUEST_DATA, 0, 0, 0) && WinHttpReceiveResponse(req, nullptr);
+    auto do_request = [&](const wchar_t* method, DWORD& status, DWORD& last_error) -> bool {
+        HINTERNET req = WinHttpOpenRequest(connect, method, path.c_str(), nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, flags);
+        if (!req) { last_error = GetLastError(); return false; }
+        BOOL ok = WinHttpSendRequest(req, WINHTTP_NO_ADDITIONAL_HEADERS, 0, WINHTTP_NO_REQUEST_DATA, 0, 0, 0) && WinHttpReceiveResponse(req, nullptr);
+        if (ok) {
+            DWORD size = sizeof(status);
+            WinHttpQueryHeaders(req, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, nullptr, &status, &size, nullptr);
+        } else {
+            last_error = GetLastError();
+        }
+        WinHttpCloseHandle(req);
+        return ok;
+    };
+    DWORD status = 0, last_error = 0;
+    BOOL ok = do_request(L"HEAD", status, last_error);
+    if (!ok || status == 405 || status == 403) {
+        status = 0; last_error = 0;
+        ok = do_request(L"GET", status, last_error);
+    }
     auto end = std::chrono::steady_clock::now();
     r.latency_ms = (int)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     if (ok) {
-        DWORD status = 0, size = sizeof(status);
-        WinHttpQueryHeaders(req, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, nullptr, &status, &size, nullptr);
         r.status_code = (int)status;
         r.success = (status >= 200 && status < 400);
         if (!r.success) r.error_message = L"HTTP " + std::to_wstring(status);
     } else {
-        r.error_message = L"HTTP request failed: " + std::to_wstring(GetLastError());
+        r.error_message = L"HTTP request failed: " + std::to_wstring(last_error);
     }
-    WinHttpCloseHandle(req); WinHttpCloseHandle(connect); WinHttpCloseHandle(session);
+    WinHttpCloseHandle(connect); WinHttpCloseHandle(session);
     return r;
 }
