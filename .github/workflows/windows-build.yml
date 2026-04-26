@@ -30,7 +30,15 @@ jobs:
             /m `
             /p:Configuration=${{ matrix.configuration }} `
             /p:Platform=${{ matrix.platform }} `
-            /p:RestorePackages=false
+            /p:RestorePackages=false `
+            /p:PreferredToolArchitecture=x64 `
+            /verbosity:minimal
+
+      - name: List build outputs
+        if: always()
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse -Include *.dll,*.lib,*.obj,*.log,*.tlog -ErrorAction SilentlyContinue | Select-Object FullName,Length | Format-Table -AutoSize
 
       - name: Collect artifacts
         shell: pwsh
@@ -41,6 +49,7 @@ jobs:
             Copy-Item $_.FullName $target -Force
             Write-Host "Copied $($_.FullName) -> $target"
           }
+          if (-not (Test-Path artifact/*.dll)) { throw "NetDoctor.dll was not found after build" }
           Get-ChildItem artifact
 
       - name: Upload DLL
