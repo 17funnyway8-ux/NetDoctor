@@ -32,7 +32,13 @@ void CNetDoctorPlugin::DataRequired() { UpdateDataIfNeeded(false); }
 ITMPlugin::OptionReturn CNetDoctorPlugin::ShowOptionsDialog(void* hParent) {
     if (m_checking.load() && m_worker_thread.joinable()) m_worker_thread.join();
     LoadConfig();
-    OptionsDialog::OpenConfigFile(hParent, m_config.Path());
+    bool changed = OptionsDialog::Show(hParent, m_config.Path());
+    if (changed) {
+        LoadConfig();
+        m_last_check = {};
+        UpdateDataIfNeeded(true);
+        return OR_OPTION_CHANGED;
+    }
     return OR_OPTION_UNCHANGED;
 }
 const wchar_t* CNetDoctorPlugin::GetInfo(PluginInfoIndex index) {
@@ -41,7 +47,7 @@ const wchar_t* CNetDoctorPlugin::GetInfo(PluginInfoIndex index) {
     case TMI_DESCRIPTION: return L"网络质量诊断插件：DNS、国内/国际连通性、代理状态。";
     case TMI_AUTHOR: return L"clawclawclaw";
     case TMI_COPYRIGHT: return L"MIT";
-    case TMI_VERSION: return L"1.0.0";
+    case TMI_VERSION: return L"1.1.0";
     case TMI_URL: return L"";
     default: return L"";
     }

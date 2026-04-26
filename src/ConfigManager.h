@@ -21,6 +21,9 @@ public:
     const std::vector<TargetConfig>& HomeTargets() const { return m_home_targets; }
     const std::vector<EndpointConfig>& ProxyPorts() const { return m_proxy_ports; }
     const std::vector<std::wstring>& PublicIpProviders() const { return m_public_ip_providers; }
+    bool DnsEnabled() const { return m_dns_enabled; }
+    bool CnEnabled() const { return m_cn_enabled; }
+    bool IntlEnabled() const { return m_intl_enabled; }
     bool DeveloperEnabled() const { return m_dev_enabled; }
     bool CustomSitesEnabled() const { return m_custom_enabled; }
     bool PingEnabled() const { return m_ping_enabled; }
@@ -51,6 +54,9 @@ private:
     std::vector<TargetConfig> m_home_targets;
     std::vector<EndpointConfig> m_proxy_ports;
     std::vector<std::wstring> m_public_ip_providers;
+    bool m_dns_enabled{true};
+    bool m_cn_enabled{true};
+    bool m_intl_enabled{true};
     bool m_dev_enabled{false};
     bool m_custom_enabled{false};
     bool m_ping_enabled{false};

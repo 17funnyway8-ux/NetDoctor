@@ -109,12 +109,13 @@ Providers=https://api.ipify.org,https://ifconfig.me/ip
 - V0.7：AI Profile，默认关闭，检测 OpenAI、Anthropic、Gemini、Hugging Face、Ollama、LM Studio。
 - V0.8：Home/LAN Profile，默认关闭，检测路由器、NAS、Home Assistant、Jellyfin 等。
 - V1.0：提供基础配置入口；插件管理里点击“选项”会打开 `NetDoctor.ini`。
+- V1.1：提供原生 Win32 图形化配置窗口；点击“选项”可编辑主要 INI 配置，保存后即时 reload 并触发后台重新检测。
 
 ## 当前限制
 
 - 虽然已异步检测，但目标数量仍不宜过多。
-- 暂无图形化设置界面。
-- 暂未实现完整图形化配置 UI、自绘状态指示、历史统计。
+- 图形化设置界面已覆盖主要 INI 项，但暂未做更复杂的目标列表表格编辑器。
+- 暂未实现自绘状态指示、历史统计。
 - HTTP 优先使用 HEAD，请求失败或遇到 403/405 时 fallback 到 GET。
 
 ## 设计文档

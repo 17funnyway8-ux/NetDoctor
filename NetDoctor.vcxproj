@@ -19,7 +19,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup>
     <ClCompile><WarningLevel>Level3</WarningLevel><SDLCheck>true</SDLCheck><ConformanceMode>true</ConformanceMode><LanguageStandard>stdcpp17</LanguageStandard><AdditionalIncludeDirectories>include;src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories></ClCompile>
-    <Link><SubSystem>Windows</SubSystem><AdditionalDependencies>Winhttp.lib;Ws2_32.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies></Link>
+    <Link><SubSystem>Windows</SubSystem><AdditionalDependencies>Winhttp.lib;Ws2_32.lib;Iphlpapi.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies></Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\PluginInterface.h" />

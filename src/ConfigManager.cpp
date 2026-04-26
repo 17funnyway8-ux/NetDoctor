@@ -74,8 +74,11 @@ bool ConfigManager::Load(const std::wstring& path) {
     m_thresholds.latency_slow_ms = ReadInt(L"Threshold", L"LatencySlowMs", 300);
     m_thresholds.dns_good_ms = ReadInt(L"Threshold", L"DnsGoodMs", 80);
     m_thresholds.dns_slow_ms = ReadInt(L"Threshold", L"DnsSlowMs", 200);
+    m_dns_enabled = ReadInt(L"DNS", L"Enabled", 1) != 0;
     m_dns_domains = Utils::Split(ReadString(L"DNS", L"Domains", L"www.baidu.com,github.com,cloudflare.com"), L',');
+    m_cn_enabled = ReadInt(L"CN", L"Enabled", 1) != 0;
     m_cn_targets = ParseTargets(ReadString(L"CN", L"Targets", L"Baidu|https://www.baidu.com,QQ|https://www.qq.com"));
+    m_intl_enabled = ReadInt(L"International", L"Enabled", 1) != 0;
     m_intl_targets = ParseTargets(ReadString(L"International", L"Targets", L"GitHub|https://github.com,Cloudflare|https://www.cloudflare.com"));
     m_dev_enabled = ReadInt(L"Developer", L"Enabled", 0) != 0;
     m_dev_targets = ParseTargets(ReadString(L"Developer", L"Targets", L"GitHub|https://github.com,GitHubRaw|https://raw.githubusercontent.com,npm|https://registry.npmjs.org,PyPI|https://pypi.org,Docker|https://hub.docker.com"));

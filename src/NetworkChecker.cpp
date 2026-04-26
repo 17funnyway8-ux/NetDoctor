@@ -6,9 +6,9 @@
 NetDoctorState NetworkChecker::CheckAll(const ConfigManager& config) {
     WSADATA wsa{}; WSAStartup(MAKEWORD(2,2), &wsa);
     NetDoctorState s;
-    s.dns_results = m_dns.Check(config.DnsDomains());
-    s.cn_results = m_http.Check(config.CnTargets(), config.TimeoutMilliseconds());
-    s.intl_results = m_http.Check(config.IntlTargets(), config.TimeoutMilliseconds());
+    if (config.DnsEnabled()) s.dns_results = m_dns.Check(config.DnsDomains());
+    if (config.CnEnabled()) s.cn_results = m_http.Check(config.CnTargets(), config.TimeoutMilliseconds());
+    if (config.IntlEnabled()) s.intl_results = m_http.Check(config.IntlTargets(), config.TimeoutMilliseconds());
     if (config.DeveloperEnabled()) s.dev_results = m_http.Check(config.DeveloperTargets(), config.TimeoutMilliseconds());
     if (config.CustomSitesEnabled()) s.custom_results = m_http.Check(config.CustomTargets(), config.TimeoutMilliseconds());
     if (config.PingEnabled()) s.ping_results = m_ping.Check(config.PingHosts(), config.PingCount(), config.TimeoutMilliseconds());
