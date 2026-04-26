@@ -1,0 +1,50 @@
+name: Build NetDoctor DLL
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        platform: [x64, Win32]
+        configuration: [Release]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build
+        shell: pwsh
+        run: |
+          msbuild NetDoctor.sln `
+            /m `
+            /p:Configuration=${{ matrix.configuration }} `
+            /p:Platform=${{ matrix.platform }} `
+            /p:RestorePackages=false
+
+      - name: Collect artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifact | Out-Null
+          Get-ChildItem -Recurse -Filter NetDoctor.dll | ForEach-Object {
+            $target = "artifact/NetDoctor-${{ matrix.platform }}.dll"
+            Copy-Item $_.FullName $target -Force
+            Write-Host "Copied $($_.FullName) -> $target"
+          }
+          Get-ChildItem artifact
+
+      - name: Upload DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: NetDoctor-${{ matrix.platform }}-${{ matrix.configuration }}
+          path: artifact/*.dll
