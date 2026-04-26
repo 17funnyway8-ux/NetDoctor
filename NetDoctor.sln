@@ -8,8 +8,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64
-		Debug|x86 = Debug|Win32
-		Release|x86 = Release|Win32
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9C8B0D1E-52B5-45BB-9E55-5F4D2C893001}.Debug|x64.ActiveCfg = Debug|x64
