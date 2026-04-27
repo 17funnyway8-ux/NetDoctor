@@ -18,7 +18,15 @@
   <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration"><ConfigurationType>DynamicLibrary</ConfigurationType><UseDebugLibraries>false</UseDebugLibraries><PlatformToolset>v143</PlatformToolset><WholeProgramOptimization>true</WholeProgramOptimization><CharacterSet>Unicode</CharacterSet><LanguageStandard>stdcpp17</LanguageStandard></PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup>
-    <ClCompile><WarningLevel>Level3</WarningLevel><SDLCheck>true</SDLCheck><ConformanceMode>true</ConformanceMode><LanguageStandard>stdcpp17</LanguageStandard><AdditionalIncludeDirectories>include;src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories></ClCompile>
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>include;src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <!-- Source files are UTF-8. Without /utf-8, MSVC decodes Chinese wide string literals using the system ANSI code page, causing mojibake such as "NetDoctor è®¾ç½®". -->
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <Link><SubSystem>Windows</SubSystem><AdditionalDependencies>Winhttp.lib;Ws2_32.lib;Iphlpapi.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies></Link>
   </ItemDefinitionGroup>
   <ItemGroup>
